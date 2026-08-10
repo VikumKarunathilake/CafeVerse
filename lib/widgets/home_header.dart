@@ -22,10 +22,14 @@ class HomeHeader extends StatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            child: const Icon(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(
               Icons.local_cafe_rounded,
-              color: Colors.brown,
-              size: 32,
+              color: theme.colorScheme.onPrimaryContainer,
+              size: 28,
             ),
           ),
           const SizedBox(width: 14),
@@ -33,10 +37,11 @@ class HomeHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'CafeVerse',
+                'CaféVerse',
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.5,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],

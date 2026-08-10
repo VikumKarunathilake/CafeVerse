@@ -12,12 +12,29 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
 
-  final List<({IconData icon, IconData activeIcon, String label})> _navItems = const [
-    (icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: 'Home'),
-    (icon: Icons.explore_outlined, activeIcon: Icons.explore_rounded, label: 'Explore'),
-    (icon: Icons.animation_outlined, activeIcon: Icons.animation_rounded, label: 'Anime'),
-    (icon: Icons.bookmark_border_rounded, activeIcon: Icons.bookmark_rounded, label: 'Watchlist'),
-  ];
+  final List<({IconData icon, IconData activeIcon, String label})> _navItems =
+      const [
+        (
+          icon: Icons.home_outlined,
+          activeIcon: Icons.home_rounded,
+          label: 'Home',
+        ),
+        (
+          icon: Icons.explore_outlined,
+          activeIcon: Icons.explore_rounded,
+          label: 'Explore',
+        ),
+        (
+          icon: Icons.animation_outlined,
+          activeIcon: Icons.animation_rounded,
+          label: 'Anime',
+        ),
+        (
+          icon: Icons.bookmark_border_rounded,
+          activeIcon: Icons.bookmark_rounded,
+          label: 'Watchlist',
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +42,8 @@ class _MainShellState extends State<MainShell> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isLandscapeWide = constraints.maxWidth > constraints.maxHeight &&
+        final isLandscapeWide =
+            constraints.maxWidth > constraints.maxHeight &&
             constraints.maxWidth >= Breakpoints.medium;
 
         if (isLandscapeWide) {
@@ -36,10 +54,12 @@ class _MainShellState extends State<MainShell> {
                 Container(
                   width: 88,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
+                    color: theme.colorScheme.surfaceContainerLow,
                     border: Border(
                       right: BorderSide(
-                        color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+                        color: theme.colorScheme.outlineVariant.withValues(
+                          alpha: 0.3,
+                        ),
                       ),
                     ),
                   ),
@@ -51,17 +71,12 @@ class _MainShellState extends State<MainShell> {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                theme.colorScheme.primary,
-                                theme.colorScheme.tertiary,
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(14),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.local_cafe_rounded,
-                            color: Colors.white,
+                            color: theme.colorScheme.onPrimaryContainer,
                             size: 26,
                           ),
                         ),
@@ -72,22 +87,31 @@ class _MainShellState extends State<MainShell> {
                         child: ListView.separated(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           itemCount: _navItems.length,
-                          separatorBuilder: (_, _) => const SizedBox(height: 12),
+                          separatorBuilder: (_, _) =>
+                              const SizedBox(height: 12),
                           itemBuilder: (context, index) {
                             final item = _navItems[index];
                             final isSelected = _selectedIndex == index;
 
                             return InkWell(
                               borderRadius: BorderRadius.circular(16),
-                              onTap: () => setState(() => _selectedIndex = index),
+                              onTap: () =>
+                                  setState(() => _selectedIndex = index),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     AnimatedContainer(
-                                      duration: const Duration(milliseconds: 250),
-                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                                      duration: const Duration(
+                                        milliseconds: 250,
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 18,
+                                        vertical: 6,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: isSelected
                                             ? theme.colorScheme.primaryContainer
@@ -95,23 +119,34 @@ class _MainShellState extends State<MainShell> {
                                         borderRadius: BorderRadius.circular(16),
                                       ),
                                       child: Icon(
-                                        isSelected ? item.activeIcon : item.icon,
+                                        isSelected
+                                            ? item.activeIcon
+                                            : item.icon,
                                         color: isSelected
-                                            ? theme.colorScheme.onPrimaryContainer
-                                            : theme.colorScheme.onSurfaceVariant,
+                                            ? theme
+                                                  .colorScheme
+                                                  .onPrimaryContainer
+                                            : theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                         size: 24,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       item.label,
-                                      style: theme.textTheme.labelSmall?.copyWith(
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                                        color: isSelected
-                                            ? theme.colorScheme.primary
-                                            : theme.colorScheme.onSurfaceVariant,
-                                        fontSize: 11,
-                                      ),
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            fontWeight: isSelected
+                                                ? FontWeight.bold
+                                                : FontWeight.w500,
+                                            color: isSelected
+                                                ? theme.colorScheme.primary
+                                                : theme
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                            fontSize: 11,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -135,9 +170,7 @@ class _MainShellState extends State<MainShell> {
                 ),
 
                 // Main Content
-                const Expanded(
-                  child: HomeScreen(),
-                ),
+                const Expanded(child: HomeScreen()),
               ],
             ),
           );
@@ -147,7 +180,8 @@ class _MainShellState extends State<MainShell> {
             body: const HomeScreen(),
             bottomNavigationBar: NavigationBar(
               selectedIndex: _selectedIndex,
-              onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+              onDestinationSelected: (index) =>
+                  setState(() => _selectedIndex = index),
               destinations: _navItems.map((item) {
                 return NavigationDestination(
                   icon: Icon(item.icon),

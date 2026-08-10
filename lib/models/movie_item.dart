@@ -55,6 +55,17 @@ class MovieItem {
     Icons.speed_rounded,
   ];
 
+  static String? _buildTmdbUrl(String? path, String size) {
+    if (path == null) return null;
+    final trimmed = path.trim();
+    if (trimmed.isEmpty) return null;
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return trimmed;
+    }
+    final cleanPath = trimmed.startsWith('/') ? trimmed : '/$trimmed';
+    return 'https://image.tmdb.org/t/p/$size$cleanPath';
+  }
+
   factory MovieItem.fromJson(
     Map<String, dynamic> map,
     int index, {
@@ -80,12 +91,10 @@ class MovieItem {
 
     final backdropPath = map['backdropPath'] as String?;
     final posterPath = map['posterPath'] as String?;
-    final backdropUrl = (backdropPath != null && backdropPath.isNotEmpty)
-        ? 'https://image.tmdb.org/t/p/w780$backdropPath'
-        : null;
-    final posterUrl = (posterPath != null && posterPath.isNotEmpty)
-        ? 'https://image.tmdb.org/t/p/w500$posterPath'
-        : null;
+    // backdropUrl max resolution limit: 1280x720 (TMDB w1280)
+    final backdropUrl = _buildTmdbUrl(backdropPath, 'w1280');
+    // posterUrl max resolution limit: 720x1080 (TMDB w780 HD poster standard)
+    final posterUrl = _buildTmdbUrl(posterPath, 'w780');
 
     final genre = isAnime
         ? 'Anime'

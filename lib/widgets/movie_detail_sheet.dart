@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/movie_item.dart';
+import 'app_cached_image.dart';
 
 class MovieDetailSheet extends StatelessWidget {
   final MovieItem item;
@@ -48,14 +49,11 @@ class MovieDetailSheet extends StatelessWidget {
                     SizedBox(
                       height: 240,
                       width: double.infinity,
-                      child: Image.network(
-                        item.backdropUrl ?? item.posterUrl!,
+                      child: AppCachedNetworkImage(
+                        imageUrl: item.backdropUrl ?? item.posterUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: item.gradient),
-                          ),
-                        ),
+                        fallbackGradient: item.gradient,
+                        fallbackIcon: item.icon,
                       ),
                     )
                   else
@@ -133,22 +131,22 @@ class MovieDetailSheet extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withValues(alpha: 0.2),
+                            color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.7),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.star_rounded,
                                 size: 16,
-                                color: Colors.amber,
+                                color: theme.colorScheme.tertiary,
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 item.rating,
-                                style: const TextStyle(
-                                  color: Colors.amber,
+                                style: TextStyle(
+                                  color: theme.colorScheme.onTertiaryContainer,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),

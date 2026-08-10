@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/movie_item.dart';
+import 'app_cached_image.dart';
 
 class HeroCarousel extends StatefulWidget {
   final List<MovieItem> items;
@@ -135,14 +136,11 @@ class _HeroCarouselState extends State<HeroCarousel> {
                         children: [
                           // Backdrop / Poster image
                           if (hasImage)
-                            Image.network(
-                              item.backdropUrl ?? item.posterUrl!,
+                            AppCachedNetworkImage(
+                              imageUrl: item.backdropUrl ?? item.posterUrl!,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, _, _) => Container(
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(colors: item.gradient),
-                                ),
-                              ),
+                              fallbackGradient: item.gradient,
+                              fallbackIcon: item.icon,
                             ),
 
                           // Multi-gradient cinematic overlay
@@ -201,13 +199,12 @@ class _HeroCarouselState extends State<HeroCarousel> {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: theme.colorScheme.primary
-                                            .withValues(alpha: 0.9),
+                                        color: theme.colorScheme.primaryContainer,
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: theme.colorScheme.primary
-                                                .withValues(alpha: 0.4),
+                                            color: theme.colorScheme.shadow
+                                                .withValues(alpha: 0.3),
                                             blurRadius: 8,
                                             offset: const Offset(0, 2),
                                           ),
@@ -222,13 +219,17 @@ class _HeroCarouselState extends State<HeroCarousel> {
                                                 : Icons
                                                     .local_fire_department_rounded,
                                             size: 14,
-                                            color: Colors.white,
+                                            color: theme
+                                                .colorScheme
+                                                .onPrimaryContainer,
                                           ),
                                           const SizedBox(width: 5),
                                           Text(
                                             item.tag,
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                                            style: TextStyle(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
                                               fontWeight: FontWeight.w800,
                                               fontSize: 11,
                                               letterSpacing: 1.0,
@@ -244,27 +245,29 @@ class _HeroCarouselState extends State<HeroCarousel> {
                                         vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.black.withValues(alpha: 0.6),
+                                        color: theme
+                                            .colorScheme
+                                            .surfaceContainerLowest
+                                            .withValues(alpha: 0.75),
                                         borderRadius: BorderRadius.circular(10),
                                         border: Border.all(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.15,
-                                          ),
+                                          color: theme.colorScheme.outlineVariant
+                                              .withValues(alpha: 0.3),
                                         ),
                                       ),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          const Icon(
+                                          Icon(
                                             Icons.star_rounded,
                                             size: 16,
-                                            color: Colors.amber,
+                                            color: theme.colorScheme.tertiary,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             item.rating,
-                                            style: const TextStyle(
-                                              color: Colors.white,
+                                            style: TextStyle(
+                                              color: theme.colorScheme.onSurface,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                             ),
@@ -273,9 +276,9 @@ class _HeroCarouselState extends State<HeroCarousel> {
                                           Text(
                                             '• ${item.year}',
                                             style: TextStyle(
-                                              color: Colors.white.withValues(
-                                                alpha: 0.8,
-                                              ),
+                                              color: theme
+                                                  .colorScheme
+                                                  .onSurfaceVariant,
                                               fontSize: 12,
                                             ),
                                           ),
@@ -335,8 +338,10 @@ class _HeroCarouselState extends State<HeroCarousel> {
                                   children: [
                                     FilledButton.icon(
                                       style: FilledButton.styleFrom(
-                                        backgroundColor: Colors.white,
-                                        foregroundColor: Colors.black,
+                                        backgroundColor:
+                                            theme.colorScheme.primary,
+                                        foregroundColor:
+                                            theme.colorScheme.onPrimary,
                                         padding: EdgeInsets.symmetric(
                                           horizontal:
                                               widget.isWide ? 20 : 14,
@@ -381,8 +386,9 @@ class _HeroCarouselState extends State<HeroCarousel> {
                   child: Center(
                     child: IconButton.filledTonal(
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.black.withValues(alpha: 0.5),
-                        foregroundColor: Colors.white,
+                        backgroundColor: theme.colorScheme.surfaceContainerLowest
+                            .withValues(alpha: 0.7),
+                        foregroundColor: theme.colorScheme.onSurface,
                       ),
                       icon: const Icon(Icons.chevron_left_rounded, size: 28),
                       onPressed: _prevHero,
@@ -396,8 +402,9 @@ class _HeroCarouselState extends State<HeroCarousel> {
                   child: Center(
                     child: IconButton.filledTonal(
                       style: IconButton.styleFrom(
-                        backgroundColor: Colors.black.withValues(alpha: 0.5),
-                        foregroundColor: Colors.white,
+                        backgroundColor: theme.colorScheme.surfaceContainerLowest
+                            .withValues(alpha: 0.7),
+                        foregroundColor: theme.colorScheme.onSurface,
                       ),
                       icon: const Icon(Icons.chevron_right_rounded, size: 28),
                       onPressed: _nextHero,

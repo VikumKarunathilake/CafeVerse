@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/movie_item.dart';
+import 'app_cached_image.dart';
 
 class MovieCard extends StatelessWidget {
   final MovieItem item;
@@ -49,21 +50,11 @@ class MovieCard extends StatelessWidget {
             children: [
               // Poster Image or Fallback Gradient
               if (hasPoster)
-                Image.network(
-                  item.posterUrl ?? item.backdropUrl!,
+                AppCachedNetworkImage(
+                  imageUrl: item.posterUrl ?? item.backdropUrl!,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: item.gradient,
-                      ),
-                    ),
-                    child: Center(
-                      child: Icon(item.icon, size: 48, color: Colors.white24),
-                    ),
-                  ),
+                  fallbackGradient: item.gradient,
+                  fallbackIcon: item.icon,
                 )
               else
                 Container(
@@ -105,22 +96,29 @@ class MovieCard extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.65),
+                    color: theme.colorScheme.surfaceContainerLowest.withValues(
+                      alpha: 0.75,
+                    ),
                     borderRadius: BorderRadius.circular(7),
+                    border: Border.all(
+                      color: theme.colorScheme.outlineVariant.withValues(
+                        alpha: 0.25,
+                      ),
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.star_rounded,
                         size: 13,
-                        color: Colors.amber,
+                        color: theme.colorScheme.tertiary,
                       ),
                       const SizedBox(width: 3),
                       Text(
                         item.rating,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
@@ -140,13 +138,13 @@ class MovieCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.85),
+                      color: theme.colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
+                    child: Text(
                       'ANIME',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: theme.colorScheme.onPrimaryContainer,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
