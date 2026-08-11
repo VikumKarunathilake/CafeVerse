@@ -6,8 +6,8 @@ void main() {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const CafeVerseApp());
 
-    // Verify that app renders CafeVerse title
-    expect(find.text('CafeVerse'), findsWidgets);
+    // Verify that app renders CaféVerse title
+    expect(find.text('CaféVerse'), findsWidgets);
     expect(find.text('Home'), findsWidgets);
   });
 }

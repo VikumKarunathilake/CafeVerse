@@ -10,14 +10,19 @@ import '../widgets/movie_detail_sheet.dart';
 import '../widgets/movie_section.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? initialCategory;
+
+  const HomeScreen({
+    super.key,
+    this.initialCategory,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  String _selectedCategory = 'All';
+  late String _selectedCategory;
 
   static const List<String> _categories = [
     'All',
@@ -40,7 +45,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedCategory = widget.initialCategory ?? 'All';
     _fetchAllMovies();
+  }
+
+  @override
+  void didUpdateWidget(covariant HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialCategory != null &&
+        widget.initialCategory != oldWidget.initialCategory) {
+      setState(() {
+        _selectedCategory = widget.initialCategory!;
+      });
+    }
   }
 
   Future<void> _fetchAllMovies() async {
@@ -185,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
               heroHeight = 220.0;
             }
 
-            // Card dimensions based on available width
+            // Poster Card dimensions based on available width
             final double cardWidth;
             final double cardHeight;
             final double sectionHeight;

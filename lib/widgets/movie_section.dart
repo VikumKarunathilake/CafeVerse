@@ -11,6 +11,7 @@ class MovieSection extends StatelessWidget {
   final double cardWidth;
   final double cardHeight;
   final double sectionHeight;
+  final MovieCardType cardType;
   final ValueChanged<MovieItem> onMovieTap;
   final VoidCallback? onSeeAll;
 
@@ -24,6 +25,7 @@ class MovieSection extends StatelessWidget {
     required this.cardWidth,
     required this.cardHeight,
     required this.sectionHeight,
+    this.cardType = MovieCardType.poster,
     required this.onMovieTap,
     this.onSeeAll,
   });
@@ -84,6 +86,7 @@ class MovieSection extends StatelessWidget {
                       item: item,
                       width: cardWidth,
                       height: cardHeight,
+                      cardType: cardType,
                       onTap: () => onMovieTap(item),
                     );
                   },

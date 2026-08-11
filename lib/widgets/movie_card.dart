@@ -2,10 +2,16 @@ import 'package:flutter/material.dart';
 import '../models/movie_item.dart';
 import 'app_cached_image.dart';
 
+enum MovieCardType {
+  poster,
+  backdrop,
+}
+
 class MovieCard extends StatelessWidget {
   final MovieItem item;
   final double width;
   final double height;
+  final MovieCardType cardType;
   final VoidCallback onTap;
 
   const MovieCard({
@@ -13,13 +19,18 @@ class MovieCard extends StatelessWidget {
     required this.item,
     required this.width,
     required this.height,
+    this.cardType = MovieCardType.poster,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasPoster = item.posterUrl != null || item.backdropUrl != null;
+    final isBackdropCard = cardType == MovieCardType.backdrop;
+    final imageUrl = isBackdropCard
+        ? (item.backdropUrl ?? item.posterUrl)
+        : (item.posterUrl ?? item.backdropUrl);
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
@@ -37,8 +48,8 @@ class MovieCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: isBackdropCard ? 0.28 : 0.2),
+              blurRadius: isBackdropCard ? 14 : 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -48,10 +59,10 @@ class MovieCard extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Poster Image or Fallback Gradient
-              if (hasPoster)
+              // Image or Fallback Gradient
+              if (hasImage)
                 AppCachedNetworkImage(
-                  imageUrl: item.posterUrl ?? item.backdropUrl!,
+                  imageUrl: imageUrl,
                   fit: BoxFit.cover,
                   fallbackGradient: item.gradient,
                   fallbackIcon: item.icon,
@@ -76,12 +87,20 @@ class MovieCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withValues(alpha: 0.3),
-                      Colors.transparent,
-                      Colors.black.withValues(alpha: 0.88),
-                    ],
-                    stops: const [0.0, 0.4, 1.0],
+                    colors: isBackdropCard
+                        ? [
+                            Colors.black.withValues(alpha: 0.25),
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.9),
+                          ]
+                        : [
+                            Colors.black.withValues(alpha: 0.3),
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.88),
+                          ],
+                    stops: isBackdropCard
+                        ? const [0.0, 0.3, 1.0]
+                        : const [0.0, 0.4, 1.0],
                   ),
                 ),
               ),
@@ -128,6 +147,7 @@ class MovieCard extends StatelessWidget {
                 ),
               ),
 
+              // Top Right Badge (Anime or Backdrop tag)
               if (item.isAnime)
                 Positioned(
                   top: 8,
@@ -151,6 +171,40 @@ class MovieCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                )
+              else if (isBackdropCard && item.formattedRuntime != null)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.schedule_rounded,
+                          size: 10,
+                          color: Colors.white70,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          item.formattedRuntime!,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
 
               // Bottom Title & Meta
@@ -164,7 +218,7 @@ class MovieCard extends StatelessWidget {
                   children: [
                     Text(
                       item.title,
-                      maxLines: 2,
+                      maxLines: isBackdropCard ? 1 : 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
@@ -181,14 +235,41 @@ class MovieCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 3),
-                    Text(
-                      '${item.genre} • ${item.year}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.75),
-                        fontSize: 11,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${item.genre} • ${item.year}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        if (isBackdropCard) ...[
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 4.5,
+                              vertical: 1.5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'HD',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 8.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ],
                 ),
