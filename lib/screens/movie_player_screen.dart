@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_win_floating/webview_win_floating.dart';
 import '../core/responsive.dart';
+import '../core/stream_cleaner.dart';
 import '../models/movie_item.dart';
 import '../widgets/app_cached_image.dart';
 import '../widgets/app_navigation_bar.dart';
@@ -63,6 +64,12 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
         winCtrl.setJavaScriptMode(JavaScriptMode.unrestricted);
         winCtrl.setNavigationDelegate(
           WinNavigationDelegate(
+            onNavigationRequest: (request) {
+              if (StreamCleaner.isAllowedNavigation(request.url, _embedUrl)) {
+                return NavigationDecision.navigate;
+              }
+              return NavigationDecision.prevent;
+            },
             onPageStarted: (url) {
               if (mounted) setState(() => _isLoading = true);
             },
@@ -73,10 +80,20 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
                   _loadingProgress = 100;
                 });
               }
+              StreamCleaner.apply(winController: winCtrl);
+              Future.delayed(const Duration(milliseconds: 1000), () {
+                StreamCleaner.apply(winController: winCtrl);
+              });
+              Future.delayed(const Duration(milliseconds: 2500), () {
+                StreamCleaner.apply(winController: winCtrl);
+              });
             },
             onProgress: (progress) {
               if (mounted) {
                 setState(() => _loadingProgress = progress);
+              }
+              if (progress > 50) {
+                StreamCleaner.apply(winController: winCtrl);
               }
             },
           ),
@@ -85,36 +102,52 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
         _winController = winCtrl;
       } else {
         _isWindows = false;
-        final mobCtrl = WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setBackgroundColor(Colors.black)
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onProgress: (int progress) {
-                if (mounted) {
-                  setState(() => _loadingProgress = progress);
-                }
-              },
-              onPageStarted: (String url) {
-                if (mounted) setState(() => _isLoading = true);
-              },
-              onPageFinished: (String url) {
-                if (mounted) {
-                  setState(() {
-                    _isLoading = false;
-                    _loadingProgress = 100;
-                  });
-                }
-              },
-              onWebResourceError: (WebResourceError error) {
-                if (mounted) {
-                  setState(() => _isLoading = false);
-                }
-              },
-            ),
-          )
-          ..loadRequest(Uri.parse(_embedUrl));
+        final mobCtrl = WebViewController();
         _mobileController = mobCtrl;
+        mobCtrl.setJavaScriptMode(JavaScriptMode.unrestricted);
+        mobCtrl.setBackgroundColor(Colors.black);
+        mobCtrl.setNavigationDelegate(
+          NavigationDelegate(
+            onNavigationRequest: (NavigationRequest request) {
+              if (StreamCleaner.isAllowedNavigation(request.url, _embedUrl)) {
+                return NavigationDecision.navigate;
+              }
+              return NavigationDecision.prevent;
+            },
+            onProgress: (int progress) {
+              if (mounted) {
+                setState(() => _loadingProgress = progress);
+              }
+              if (progress > 50) {
+                StreamCleaner.apply(mobileController: mobCtrl);
+              }
+            },
+            onPageStarted: (String url) {
+              if (mounted) setState(() => _isLoading = true);
+            },
+            onPageFinished: (String url) {
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                  _loadingProgress = 100;
+                });
+              }
+              StreamCleaner.apply(mobileController: mobCtrl);
+              Future.delayed(const Duration(milliseconds: 1000), () {
+                StreamCleaner.apply(mobileController: mobCtrl);
+              });
+              Future.delayed(const Duration(milliseconds: 2500), () {
+                StreamCleaner.apply(mobileController: mobCtrl);
+              });
+            },
+            onWebResourceError: (WebResourceError error) {
+              if (mounted) {
+                setState(() => _isLoading = false);
+              }
+            },
+          ),
+        );
+        mobCtrl.loadRequest(Uri.parse(_embedUrl));
       }
     } catch (e) {
       if (mounted) {
@@ -574,6 +607,21 @@ class _MoviePlayerScreenState extends State<MoviePlayerScreen> {
                   ),
                 ),
               ),
+
+            // Top-right watermark click protection shield
+            Positioned(
+              top: 0,
+              right: 0,
+              width: 100,
+              height: 60,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  // Intercept and swallow taps to prevent opening watermark link
+                },
+                child: const SizedBox.expand(),
+              ),
+            ),
           ],
         ),
       ),
